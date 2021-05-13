@@ -57,7 +57,7 @@ module.exports.createNewUser = async (request, response) => {
     if (devEnvironment){
         otpServiceResponse = await fetch('http://localhost:3000' + api, options).then(res => res.json())
     }else{
-        otpServiceResponse = await fetch('https://yalla-dardasha-user.herokuapp.com' + api, options).then(res => res.json())
+        otpServiceResponse = await fetch('https://yalla-dardasha-otp.herokuapp.com' + api, options).then(res => res.json())
     }
 
     if (otpServiceResponse.code === 200)    // return jwt token if success
