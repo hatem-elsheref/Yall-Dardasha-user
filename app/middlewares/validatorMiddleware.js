@@ -1,10 +1,10 @@
-const { body, check , ValidationChain} = require('express-validator')
+const { body, check} = require('express-validator')
 
-const {services_api_key : API_KEY} = require('./../config/app')
+const {apiKey} = require('./../config')
 
 module.exports.allowedToAccess = (request, response, next) => {
     try {
-        if (request.headers["api_key"] !== API_KEY){
+        if (request.headers["api_key"] !== apiKey){
             return response.json({code : 401, user : null, message : 'not allowed to access this resource'})
         }
     }catch (Error){
@@ -13,6 +13,8 @@ module.exports.allowedToAccess = (request, response, next) => {
 
     next()
 }
+
+
 module.exports.userValidator = () => {
 
     return [

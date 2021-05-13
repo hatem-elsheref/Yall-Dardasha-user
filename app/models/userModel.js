@@ -1,4 +1,4 @@
-const mongooseConnection = require('./../config/mongo')
+const mongooseConnection = require('../mongoConnection')
 
 const Schema = mongooseConnection.Schema;
 
@@ -12,7 +12,5 @@ const User = new Schema({
     instagram: { type: String, required: false },
     created_at: { type: Date, default: Date.now },
 });
-
-
 
 module.exports = mongooseConnection.model('User', User);

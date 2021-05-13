@@ -1,6 +1,6 @@
-const Response = require('./response')
-
 const { validationResult } = require('express-validator')
+
+const Response = require('./response')
 
 module.exports.checkValidationError = (request, response, next) => {
 
@@ -20,7 +20,6 @@ module.exports.checkValidationError = (request, response, next) => {
     if (!errors.isEmpty()) {
         return response.status(422).send(Response(422, 'fail', 'validation error', [], extractedErrors))
     }
-
 
     next()
 }
