@@ -1,5 +1,7 @@
 const User = require('./../models/userModel')
 
+const fetch = require('node-fetch')
+
 const {apiKey, devEnvironment, development} = require('./../config')
 
 const Response = require('./../helpers/response')
@@ -46,18 +48,20 @@ module.exports.createNewUser = async (request, response) => {
             'Content-Type': 'application/json',
             'API_KEY': apiKey
         },
-        body: JSON.stringify({ id: userInfo._id })
+        body: JSON.stringify({ user_id: userInfo._id, device : 'android-phone'})
     }
 
     let api = '/api/v1/otp/get-token'
+    let otpServiceResponse = {code : 400}
 
     if (devEnvironment){
-        otpServiceResponse = await fetch(development.url + api, options).then(res => res.json())
+        otpServiceResponse = await fetch('http://localhost:3000' + api, options).then(res => res.json())
     }else{
         otpServiceResponse = await fetch('https://yalla-dardasha-user.herokuapp.com' + api, options).then(res => res.json())
     }
 
-    // return jwt token if success
-    return response.json(Response(200, 'success', 'account created successfully', [otpServiceResponse.token], []))
-
+    if (otpServiceResponse.code === 200)    // return jwt token if success
+        return response.json(otpServiceResponse)
+    else
+        return response.json(Response(400, 'fail', 'try again later', [], []))
 }

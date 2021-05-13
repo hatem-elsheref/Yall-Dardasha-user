@@ -1,7 +1,11 @@
-const {devEnvironment, mongo} = require('config')
+const {devEnvironment, mongo} = require('./config')
 
 const mongoose = require('mongoose')
 
-await mongoose.connect( devEnvironment ? mongo.mongoDevelopmentUrl : mongo.mongoProductionUrl, mongo.options)
+async function init(){
+    await mongoose.connect( devEnvironment ? mongo.mongoDevelopmentUrl : mongo.mongoProductionUrl, mongo.options)
+}
+
+init()
 
 module.exports = mongoose;

@@ -1,4 +1,4 @@
-const configurations = require('config')
+const configurations = require('./config')
 
 const currentEnvironment = configurations.devEnvironment ? configurations.development : configurations.production
 
