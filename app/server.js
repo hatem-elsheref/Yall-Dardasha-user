@@ -4,14 +4,14 @@ const express = require('express')
 
 const bodyParser = require('body-parser')
 
-// const userService = require('./routes/userRoute')
+const userService = require('./routes/userRoute')
 
 const app = express()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// app.use('/auth/user', userService)
+app.use('/auth/user', userService)
 
 
 app.get('/me', function (request, response) {
