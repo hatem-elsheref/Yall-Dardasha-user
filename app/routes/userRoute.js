@@ -9,9 +9,6 @@ const express = require('express')
 
 const userRouter = express.Router()
 
-userRouter.get('/me', function (request, response) {
-    return response.send('Hello Yall Dardasha User Service');
-})
 
 userRouter.post('/info', allowedToAccess, getUserByPhoneNumber)
 
