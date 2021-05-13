@@ -15,4 +15,6 @@ const connect = async () => {
 
 connect()
 
+console.log(mongoose)
+
 module.exports = mongoose;
