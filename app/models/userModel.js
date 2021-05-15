@@ -3,10 +3,10 @@ const mongooseConnection = require('../mongoConnection')
 const Schema = mongooseConnection.Schema;
 
 const User = new Schema({
-    name: { type: String, required: true },
-    username: { type: String, required: true, index: true, unique: true },
+    name: { type: String, required: false },
+    username: { type: String, required: false, index: true, unique: true },
     avatar: { type: String, required: false },
-    phone: { type: String, max: 16, index: true, unique: true },
+    phone: { type: String, max: 16, index: true, unique: true, required: true },
     bio: { type: String, required: false },
     twitter: { type: String, required: false },
     instagram: { type: String, required: false },

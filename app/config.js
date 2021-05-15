@@ -2,6 +2,13 @@ module.exports = {
     serviceName : 'user service',
     serviceDescription : 'user service for create user , find user, update user, delete user',
     apiKey : '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000',
+    jwt : {
+        secret : 'W7bwoFsqizrvyDUfQxdgSB2tN6JAmCYK',
+        options: {
+            expiresIn: '24h',
+            algorithm: 'HS256'
+        }
+    },
     development : {
         port : 3001,
         url : 'http://localhost:3001'
@@ -20,5 +27,5 @@ module.exports = {
             useCreateIndex: true
         }
     },
-    devEnvironment : false
+    devEnvironment : true
 }

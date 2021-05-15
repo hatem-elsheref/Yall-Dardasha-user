@@ -1,42 +1,87 @@
+const configurations = require('./../config')
+
 const User = require('./../models/userModel')
 
 const fetch = require('node-fetch')
 
-const {apiKey, devEnvironment, development} = require('./../config')
+const JWT = require('jsonwebtoken');
+
+
+const {apiKey, devEnvironment} = require('./../config')
 
 const Response = require('./../helpers/response')
 
 module.exports.getUserByPhoneNumber = async (request, response) => {
 
-    let userInfo = null;
+    let userInfo = null
+    let verified = true
 
-    userInfo = await User.findOne({ phone: request.body.phone })
+     try {
+         userInfo = await User.findOne({ phone: request.body.phone })
 
-    response.json(userInfo === null ? { code: 404, user: null } : { code: 200, user: userInfo })
+         if (userInfo == null){
+
+             verified = false
+             userInfo = await User.create({ phone: request.body.phone })
+         }
+
+         response.json({ code: 200, user: userInfo , accountVerified : verified})
+     }catch (error){
+         response.json({ code: 400, message: error.message})
+     }
 }
 
 module.exports.createNewUser = async (request, response) => {
 
+    const authHeader = request.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
 
-    // check if user found before or not (phone and username must be unique)
-    let userInfo = await User.findOne().or([{ phone: request.body.phone}, {username : request.body.username }])
+        await JWT.verify(token, configurations.jwt.secret, configurations.jwt.options,async (err, user) => {
+            if (err) {
+                return response.sendStatus(403);
+            }
 
-    if (userInfo !== null){
-        return response.json(Response(400, 'fail', 'account already exist phone/username must be unique', [], []))
+
+            console.log(user)
+            return response.send('ok')
+
+            // check if user found before or not (phone and username must be unique)
+            let userInfo = await User.findOne().or([{ _id: user._id}, {username : request.body.username }])
+
+            if (userInfo !== null){
+                return response.json(Response(400, 'fail', 'account already exist phone/username must be unique', [], []))
+            }
+
+
+
+
+
+
+
+
+        });
+    } else {
+        response.sendStatus(401);
     }
+
+
+
+
+
 
 
     let user = {
         name : request.body.name,
         username : request.body.username,
-        phone: request.body.phone,
+        // phone: request.body.phone,
         bio : request.body.bio ?? null,
         twitter : request.body.twitter ?? null,
         instagram : request.body.instagram ?? null,
     }
 
 
-     userInfo = await User.create(user)
+     userInfo = await User.update({}, user)
 
     if (userInfo === null){
         return response.json(Response(400, 'fail', 'failed to create new account', [], []))
