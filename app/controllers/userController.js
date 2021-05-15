@@ -7,9 +7,9 @@ const fetch = require('node-fetch')
 const JWT = require('jsonwebtoken');
 
 
-const {apiKey, devEnvironment} = require('./../config')
+// const {apiKey, devEnvironment} = require('./../config')
 
-const Response = require('./../helpers/response')
+// const Response = require('./../helpers/response')
 
 module.exports.getUserByPhoneNumber = async (request, response) => {
 
@@ -33,48 +33,64 @@ module.exports.getUserByPhoneNumber = async (request, response) => {
 
 module.exports.createNewUser = async (request, response) => {
 
-    const authHeader = request.headers.authorization;
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
+    try {
+        const authHeader = request.headers.authorization;
+        if (authHeader) {
+            const token = authHeader.split(' ')[1];
 
-        await JWT.verify(token, configurations.jwt.secret, configurations.jwt.options,async (err, user) => {
-            if (err) {
-                return response.sendStatus(403);
-            }
-
-            const userObject = {
-                name : request.body.name,
-                username : request.body.username,
-                bio : request.body.bio ?? null,
-                twitter : request.body.twitter ?? null,
-                instagram : request.body.instagram ?? null,
-            }
-
-            // check if user found before or not (phone and username must be unique)
-            let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
-
-            if (userInfo == null) {
-                return response.json({
-                    code: 400,
-                    status: 'fail',
-                    message: 'account already exist phone/username must be unique or try to verify code first'
-                })
-            }
-            userObject.phone = userInfo.phone
-
-           await User.updateOne({ _id: user.user_id}, userObject)
-
-            return response.json({
-                code: 200,
-                status: 'success',
-                message: 'account updated successfully',
-                data: {
-                    accountVerified : true
+            await JWT.verify(token, configurations.jwt.secret, configurations.jwt.options,async (err, user) => {
+                if (err) {
+                    return response.status(403).json({code : 403, message: 'expired token'});
                 }
-            })
 
+                const userObject = {
+                    name : request.body.name,
+                    username : request.body.username,
+                    bio : request.body.bio ?? null,
+                    twitter : request.body.twitter ?? null,
+                    instagram : request.body.instagram ?? null,
+                }
 
-        });} else {
-        response.sendStatus(401);
+                // check if user found before
+                let userInfo = await User.findOne({ _id: user.user_id})
+                // let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
+
+                if (userInfo == null) {
+                    return response.json({
+                        code: 400,
+                        status: 'fail',
+                        message: 'try to verify code first / invalid token'
+                    })
+                }
+
+                let usernameExist = await User.findOne({ username: request.body.username})
+
+                if (usernameExist != null) {
+                    return response.json({
+                        code: 400,
+                        status: 'fail',
+                        message: 'account already exist phone/username must be unique'
+                    })
+                }
+
+                userObject.phone = userInfo.phone
+
+                await User.updateOne({ _id: user.user_id}, userObject)
+
+                return response.json({
+                    code: 200,
+                    status: 'success',
+                    message: 'account updated successfully',
+                    data: {
+                        accountVerified : true
+                    }
+                })
+
+            });} else {
+            return response.status(403).json({code : 403, message: 'no token'});
+        }
+    }catch (Error){
+        return response.status(403).json({code : 403, message: 'expired token ' + Error.message});
     }
+
 }
