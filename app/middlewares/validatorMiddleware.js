@@ -23,7 +23,7 @@ module.exports.userValidator = () => {
         body('bio').isLength({min : 0}),
         body('twitter').isLength({min : 0}),
         body('instagram').isLength({min : 0}),
-        check('phone', 'phone field must be less than or equal 16 digits long and in ar-EG format').matches(/^[0-9]{11,16}$/, "i"),
+        // check('phone', 'phone field must be less than or equal 16 digits long and in ar-EG format').matches(/^[0-9]{11,16}$/, "i"),
     ]
 
 }

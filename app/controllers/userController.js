@@ -42,71 +42,39 @@ module.exports.createNewUser = async (request, response) => {
                 return response.sendStatus(403);
             }
 
-
-            console.log(user)
-            return response.send('ok')
-
-            // check if user found before or not (phone and username must be unique)
-            let userInfo = await User.findOne().or([{ _id: user._id}, {username : request.body.username }])
-
-            if (userInfo !== null){
-                return response.json(Response(400, 'fail', 'account already exist phone/username must be unique', [], []))
+            const userObject = {
+                name : request.body.name,
+                username : request.body.username,
+                bio : request.body.bio ?? null,
+                twitter : request.body.twitter ?? null,
+                instagram : request.body.instagram ?? null,
             }
 
+            // check if user found before or not (phone and username must be unique)
+            let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
+
+            if (userInfo == null) {
+                return response.json({
+                    code: 400,
+                    status: 'fail',
+                    message: 'account already exist phone/username must be unique or try to verify code first'
+                })
+            }
+            userObject.phone = userInfo.phone
+
+           await User.updateOne({ _id: user.user_id}, userObject)
+
+            return response.json({
+                code: 200,
+                status: 'success',
+                message: 'account updated successfully',
+                data: {
+                    accountVerified : true
+                }
+            })
 
 
-
-
-
-
-
-        });
-    } else {
+        });} else {
         response.sendStatus(401);
     }
-
-
-
-
-
-
-
-    let user = {
-        name : request.body.name,
-        username : request.body.username,
-        // phone: request.body.phone,
-        bio : request.body.bio ?? null,
-        twitter : request.body.twitter ?? null,
-        instagram : request.body.instagram ?? null,
-    }
-
-
-     userInfo = await User.update({}, user)
-
-    if (userInfo === null){
-        return response.json(Response(400, 'fail', 'failed to create new account', [], []))
-    }
-
-    let options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'API_KEY': apiKey
-        },
-        body: JSON.stringify({ user_id: userInfo._id, device : 'android-phone'})
-    }
-
-    let api = '/api/v1/otp/get-token'
-    let otpServiceResponse = {code : 400}
-
-    if (devEnvironment){
-        otpServiceResponse = await fetch('http://localhost:3000' + api, options).then(res => res.json())
-    }else{
-        otpServiceResponse = await fetch('https://yalla-dardasha-otp.herokuapp.com' + api, options).then(res => res.json())
-    }
-
-    if (otpServiceResponse.code === 200)    // return jwt token if success
-        return response.json(otpServiceResponse)
-    else
-        return response.json(Response(400, 'fail', 'try again later', [], []))
 }
