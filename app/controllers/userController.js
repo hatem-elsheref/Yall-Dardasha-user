@@ -19,7 +19,7 @@ module.exports.getUserByPhoneNumber = async (request, response) => {
     try {
         userInfo = await User.findOne({ phone: request.body.phone })
 
-        console.log(userInfo);
+        // console.log(userInfo);
         if (userInfo == null) {
 
             verified = false
