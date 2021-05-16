@@ -29,8 +29,10 @@ app.get('/reset-service', async function (request, response) {
 
 
 app.get('/all', async function (request, response) {
-    let users = await mongoClientForUserModel.find({})
-    return response.json(users)
+    mongoClientForUserModel.find({}, function (err, users) {
+
+        return res.send(users);
+    });
 })
 
 
