@@ -20,7 +20,7 @@ module.exports = {
     mongo : {
         mongoDevelopmentUrl : 'mongodb://localhost/gp_clubhouse',
         // mongoProductionUrl : 'mongodb+srv://hatem:webserver@cluster0.t0ute.mongodb.net/clubhouse?retryWrites=true&w=majority',
-        mongoProductionUrl : 'mongodb+srv://hatem:webserver@clubhouse.z7yno.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+        mongoProductionUrl : 'mongodb+srv://hatem:webserver@clubhouse.z7yno.mongodb.net/clubhouse?retryWrites=true&w=majority',
         options : {
             useNewUrlParser: true,
             useUnifiedTopology: true,
