@@ -14,17 +14,19 @@ const JWT = require('jsonwebtoken');
 module.exports.getUserByPhoneNumber = async (request, response) => {
 
     let userInfo = null
-    let verified = true
+    let verified = false
 
     try {
         userInfo = await User.findOne({ phone: request.body.phone })
 
-        // console.log(userInfo);
-        if (userInfo == null || userInfo.username == null || userInfo.name == null) {
-
-            verified = false
+        if (userInfo == null) {
             userInfo = await User.create({ phone: request.body.phone })
         }
+
+        if (userInfo.username != null || userInfo.name != null){
+            verified = true
+        }
+
 
         return response.json({ code: 200, user: userInfo, accountVerified: verified })
     } catch (error) {
