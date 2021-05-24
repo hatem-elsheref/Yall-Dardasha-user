@@ -20,7 +20,7 @@ module.exports.getUserByPhoneNumber = async (request, response) => {
         userInfo = await User.findOne({ phone: request.body.phone })
 
         // console.log(userInfo);
-        if (userInfo == null) {
+        if (userInfo == null || userInfo.username == null || userInfo.name == null) {
 
             verified = false
             userInfo = await User.create({ phone: request.body.phone })
