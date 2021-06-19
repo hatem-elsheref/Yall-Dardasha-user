@@ -1,6 +1,6 @@
-const { getUserByPhoneNumber, createNewUser } = require('./../controllers/userController')
+const { getUserByPhoneNumber, createNewUser, getUser } = require('./../controllers/userController')
 
-const { userValidator, allowedToAccess } = require('./../middlewares/validatorMiddleware')
+const { userValidator, allowedToAccess , verifyToken} = require('./../middlewares/validatorMiddleware')
 
 const { checkValidationError } = require('./../helpers/validatorError')
 
@@ -10,6 +10,8 @@ const userRouter = express.Router()
 
 
 userRouter.post('/info', allowedToAccess, getUserByPhoneNumber)
+
+userRouter.post('/user', verifyToken, getUser)
 
 userRouter.post('/create', userValidator(), checkValidationError, createNewUser)
 

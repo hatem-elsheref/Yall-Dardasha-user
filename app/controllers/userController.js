@@ -23,7 +23,7 @@ module.exports.getUserByPhoneNumber = async (request, response) => {
             userInfo = await User.create({ phone: request.body.phone })
         }
 
-        if (userInfo.username != null || userInfo.name != null){
+        if (userInfo.username != null && userInfo.name != null){
             verified = true
         }
 
@@ -97,4 +97,9 @@ module.exports.createNewUser = async (request, response) => {
         return response.status(403).json({ code: 403, message: 'expired token ' + Error.message });
     }
 
+}
+
+module.exports.getUser = async (request, response) => {
+    let userInfo = await User.findOne({ _id: request.body.user_id })
+    return response.status(200).json({user: userInfo})
 }
