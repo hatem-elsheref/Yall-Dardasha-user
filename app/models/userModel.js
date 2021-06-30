@@ -10,6 +10,8 @@ const User = new Schema({
     bio: { type: String, required: false },
     twitter: { type: String, required: false },
     instagram: { type: String, required: false },
+    followers: { type: Array, required: false },
+    following: { type: Array, required: false },
     created_at: { type: Date, default: Date.now },
 });
 
