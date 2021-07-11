@@ -71,13 +71,15 @@ module.exports.createNewUser = async (request, response) => {
                     return response.status(403).json({ code: 403, message: 'expired token' });
                 }
 
+                const UN_KNOWN = 'un_known'
+
                 const userObject = {
                     name: request.body.name,
                     username: request.body.username,
-                    bio: request.body.bio ?? "un_known",
-                    twitter: request.body.twitter ?? "un_known",
-                    instagram: request.body.instagram ?? "un_known",
-                    avatar: request.body.avatar ?? "un_known"
+                    bio: request.body.bio.length === 0 ? UN_KNOWN : request.body.instagram,
+                    instagram: request.body.instagram.length === 0 ? UN_KNOWN : request.body.instagram,
+                    twitter: request.body.twitter.length === 0 ? UN_KNOWN : request.body.twitter,
+                    avatar: request.body.avatar ?? UN_KNOWN
                 }
 
                 // check if user found before
