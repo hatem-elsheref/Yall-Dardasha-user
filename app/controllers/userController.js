@@ -164,22 +164,57 @@ module.exports.follow = async (request, response) => {
     let otherUserInfo = await User.findOne({ _id: request.body.followed_user_id })
     if (authUserInfo && otherUserInfo) {
 
+        let operation = request.body.type
+        const FOLLOW = 'follow'
 
-        let following = authUserInfo.following
-        following.push(otherUserInfo._id)
-        let uniqueFollowing = following.filter(function (item, pos) {
-            return following.indexOf(item) == pos;
-        })
-        let obj1 = { ...authUserInfo._doc, following: uniqueFollowing }
+        let obj1 = {}
+        let obj2 = {}
+        function doFollow(){
+            let following = authUserInfo.following
+            following.push(otherUserInfo._id)
+            let uniqueFollowing = following.filter(function (item, pos) {
+                return following.indexOf(item) == pos;
+            })
+            obj1 = { ...authUserInfo._doc, following: uniqueFollowing }
 
 
 
-        let followers = otherUserInfo.followers
-        followers.push(authUserInfo._id)
-        let uniqueFollowers = followers.filter(function (item, pos) {
-            return followers.indexOf(item) == pos;
-        })
-        let obj2 = { ...otherUserInfo._doc, followers: uniqueFollowers }
+            let followers = otherUserInfo.followers
+            followers.push(authUserInfo._id)
+            let uniqueFollowers = followers.filter(function (item, pos) {
+                return followers.indexOf(item) == pos;
+            })
+            obj2 = { ...otherUserInfo._doc, followers: uniqueFollowers }
+        }
+
+
+        function doUnFollow(){
+            let following = authUserInfo.following
+            following.forEach((followingId, index) => {
+                if (followingId == otherUserInfo._id)
+                    following.splice(index, 1)
+            })
+
+            obj1 = { ...authUserInfo._doc, following: following }
+
+
+
+            let followers = otherUserInfo.followers
+            followers.forEach((followerId, index) => {
+                if (followerId == authUserInfo._id)
+                    followers.splice(index, 1)
+            })
+
+
+            obj2 = { ...otherUserInfo._doc, followers: followers }
+        }
+
+
+        if (operation === FOLLOW){
+            doFollow()
+        }else{
+            doUnFollow()
+        }
 
 
 
