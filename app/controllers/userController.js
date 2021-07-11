@@ -74,9 +74,10 @@ module.exports.createNewUser = async (request, response) => {
                 const userObject = {
                     name: request.body.name,
                     username: request.body.username,
-                    bio: request.body.bio ?? null,
-                    twitter: request.body.twitter ?? null,
-                    instagram: request.body.instagram ?? null,
+                    bio: request.body.bio ?? "un_known",
+                    twitter: request.body.twitter ?? "un_known",
+                    instagram: request.body.instagram ?? "un_known",
+                    avatar: request.body.avatar ?? "un_known"
                 }
 
                 // check if user found before
@@ -131,7 +132,23 @@ module.exports.getUser = async (request, response) => {
 
 
 
+module.exports.updateProfile = async (request, response) => {
 
+    let authUserInfo = await User.findOne({ _id: request.body.user_id })
+
+    const UN_KNOWN = 'un_known'
+
+    const userObject = {
+        name: request.body.name,
+        bio: request.body.bio.length === 0 ? authUserInfo.bio : request.body.bio,
+        instagram: request.body.instagram.length === 0 ? authUserInfo.instagram : request.body.instagram,
+        twitter: request.body.twitter.length === 0 ? authUserInfo.twitter : request.body.twitter
+    }
+
+    await User.updateOne({ _id: authUserInfo._id }, { ...authUserInfo._doc, ...userObject})
+
+    return response.status(200).json({ message: "success" })
+}
 
 /*
 ahmed want to follow ali

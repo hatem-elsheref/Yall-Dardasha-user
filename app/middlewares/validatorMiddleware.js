@@ -58,3 +58,14 @@ module.exports.userValidator = () => {
     ]
 
 }
+
+module.exports.userValidatorForUpdate = () => {
+
+    return [
+        body('name','name is required').isLength({min : 4}),
+        body('bio').isLength({min : 0}),
+        body('twitter').isLength({min : 0}),
+        body('instagram').isLength({min : 0}),
+    ]
+
+}
