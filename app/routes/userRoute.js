@@ -15,7 +15,7 @@ userRouter.post('/profile', verifyToken, getUserById)
 // get my (auth user)info
 userRouter.post('/user', verifyToken, getUser)
 // create account
-userRouter.post('/create', userValidator(), checkValidationError, createNewUser)
+userRouter.post('/create', userValidator(), checkValidationError, verifyToken, createNewUser)
 // update account
 userRouter.post('/update', userValidatorForUpdate(), checkValidationError, updateProfile)
 // follow member

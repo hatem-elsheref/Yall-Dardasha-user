@@ -59,68 +59,120 @@ module.exports.getUserById = async (request, response) => {
 }
 
 
+// module.exports.createNewUser = async (request, response) => {
+//
+//     try {
+//         const authHeader = request.headers.authorization;
+//         if (authHeader) {
+//             const token = authHeader.split(' ')[1];
+//
+//             await JWT.verify(token, configurations.jwt.secret, configurations.jwt.options, async (err, user) => {
+//                 if (err) {
+//                     return response.status(403).json({ code: 403, message: 'expired token' });
+//                 }
+//
+//                 const userObject = {
+//                     name: request.body.name,
+//                     username: request.body.username,
+//                     bio: request.body.bio ?? null,
+//                     instagram: request.body.instagram ?? null,
+//                     twitter: request.body.twitter ?? null,
+//                     avatar: request.body.avatar ?? null
+//                 }
+//
+//                 // check if user found before
+//                 let userInfo = await User.findOne({ _id: user.user_id })
+//                 // let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
+//
+//                 if (userInfo == null) {
+//                     return response.json({
+//                         code: 400,
+//                         status: 'fail',
+//                         message: 'try to verify code first / invalid token'
+//                     })
+//                 }
+//
+//                 let usernameExist = await User.findOne({ username: request.body.username })
+//
+//                 if (usernameExist != null) {
+//                     return response.json({
+//                         code: 400,
+//                         status: 'fail',
+//                         message: 'account already exist phone/username must be unique'
+//                     })
+//                 }
+//
+//                 userObject.phone = userInfo.phone
+//
+//                 await User.updateOne({ _id: user.user_id }, userObject)
+//
+//                 return response.json({
+//                     code: 200,
+//                     status: 'success',
+//                     message: 'account updated successfully',
+//                     data: {
+//                         accountVerified: true
+//                     }
+//                 })
+//
+//             });
+//         } else {
+//             return response.status(403).json({ code: 403, message: 'no token' });
+//         }
+//     } catch (Error) {
+//         return response.status(403).json({ code: 403, message: 'expired token ' + Error.message });
+//     }
+//
+// }
+
 module.exports.createNewUser = async (request, response) => {
 
     try {
-        const authHeader = request.headers.authorization;
-        if (authHeader) {
-            const token = authHeader.split(' ')[1];
 
-            await JWT.verify(token, configurations.jwt.secret, configurations.jwt.options, async (err, user) => {
-                if (err) {
-                    return response.status(403).json({ code: 403, message: 'expired token' });
-                }
+    const userObject = {
+        name: request.body.name,
+        username: request.body.username,
+        bio: request.body.bio ?? null,
+        instagram: request.body.instagram ?? null,
+        twitter: request.body.twitter ?? null,
+        avatar: request.body.avatar ?? null
+    }
 
-                const UN_KNOWN = 'un_known'
+    // check if user found before
+    let userInfo = await User.findOne({ _id: request.body.user_id })
+    // let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
 
-                const userObject = {
-                    name: request.body.name,
-                    username: request.body.username,
-                    bio: request.body.bio.length === 0 ? UN_KNOWN : request.body.instagram,
-                    instagram: request.body.instagram.length === 0 ? UN_KNOWN : request.body.instagram,
-                    twitter: request.body.twitter.length === 0 ? UN_KNOWN : request.body.twitter,
-                    avatar: request.body.avatar ?? UN_KNOWN
-                }
+    if (userInfo == null) {
+        return response.json({
+            code: 400,
+            status: 'fail',
+            message: 'try to verify code first / invalid token'
+        })
+    }
 
-                // check if user found before
-                let userInfo = await User.findOne({ _id: user.user_id })
-                // let userInfo = await User.findOne().or([{ _id: user.user_id}, {username : request.body.username }])
+    let usernameExist = await User.findOne({ username: request.body.username })
 
-                if (userInfo == null) {
-                    return response.json({
-                        code: 400,
-                        status: 'fail',
-                        message: 'try to verify code first / invalid token'
-                    })
-                }
+    if (usernameExist != null) {
+        return response.json({
+            code: 400,
+            status: 'fail',
+            message: 'account already exist phone/username must be unique'
+        })
+    }
 
-                let usernameExist = await User.findOne({ username: request.body.username })
+    userObject.phone = userInfo.phone
 
-                if (usernameExist != null) {
-                    return response.json({
-                        code: 400,
-                        status: 'fail',
-                        message: 'account already exist phone/username must be unique'
-                    })
-                }
+    await User.updateOne({ _id: request.body.user_id }, userObject)
 
-                userObject.phone = userInfo.phone
-
-                await User.updateOne({ _id: user.user_id }, userObject)
-
-                return response.json({
-                    code: 200,
-                    status: 'success',
-                    message: 'account updated successfully',
-                    data: {
-                        accountVerified: true
-                    }
-                })
-
-            });
-        } else {
-            return response.status(403).json({ code: 403, message: 'no token' });
+    return response.json({
+        code: 200,
+        status: 'success',
+        message: 'account updated successfully',
+        data: {
+            accountVerified: true
         }
+    })
+
     } catch (Error) {
         return response.status(403).json({ code: 403, message: 'expired token ' + Error.message });
     }
@@ -191,17 +243,17 @@ module.exports.follow = async (request, response) => {
         function doUnFollow(){
             let following = authUserInfo.following
             following.forEach((followingId, index) => {
-                if (followingId == otherUserInfo._id)
+                if (followingId.toString() === otherUserInfo._id.toString()){
                     following.splice(index, 1)
+                }
             })
+
 
             obj1 = { ...authUserInfo._doc, following: following }
 
-
-
             let followers = otherUserInfo.followers
             followers.forEach((followerId, index) => {
-                if (followerId == authUserInfo._id)
+                if (followerId.toString() == authUserInfo._id.toString())
                     followers.splice(index, 1)
             })
 
@@ -211,11 +263,12 @@ module.exports.follow = async (request, response) => {
 
 
         if (operation === FOLLOW){
+            console.log('do follow')
             doFollow()
         }else{
+            console.log('do un follow')
             doUnFollow()
         }
-
 
 
         await User.updateOne({ _id: authUserInfo._id }, obj1)
