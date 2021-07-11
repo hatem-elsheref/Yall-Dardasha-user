@@ -181,7 +181,7 @@ module.exports.createNewUser = async (request, response) => {
 
 module.exports.getUser = async (request, response) => {
     let userInfo = await User.findOne({ _id: request.body.user_id })
-    return response.status(200).json({ user: userInfo })
+    return response.status(200).json({ code: 200, user: userInfo })
 }
 
 
